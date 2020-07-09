@@ -14,3 +14,5 @@ target_link_libraries(subscene_export
         ${STLPLUS_LIBRARY})
 target_compile_definitions(subscene_export
         PRIVATE -DTHIS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+
+add_subdirectory(BA)
