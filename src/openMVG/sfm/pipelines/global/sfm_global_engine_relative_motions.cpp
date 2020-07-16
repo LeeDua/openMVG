@@ -144,6 +144,9 @@ bool GlobalSfMReconstructionEngine_RelativeMotions::Process() {
     std::cerr << "GlobalSfM:: Cannot initialize an initial structure!" << std::endl;
     return false;
   }
+  std::cout << "Early break in GLOBAL SFM, initial structure computation done!" << std::endl;
+  return true;
+
   if (!Adjust())
   {
     std::cerr << "GlobalSfM:: Non-linear adjustment failure!" << std::endl;
@@ -403,8 +406,12 @@ bool GlobalSfMReconstructionEngine_RelativeMotions::Compute_Initial_Structure
     if (!sLogging_file_.empty())
     {
       Save(sfm_data_,
-        stlplus::create_filespec(stlplus::folder_part(sLogging_file_), "initial_structure", "ply"),
-        ESfM_Data(EXTRINSICS | STRUCTURE));
+          stlplus::create_filespec(stlplus::folder_part(sLogging_file_), "initial_structure", "ply"),
+          ESfM_Data(EXTRINSICS | STRUCTURE));
+      Save(sfm_data_,
+           stlplus::create_filespec(stlplus::folder_part(sLogging_file_), "pre_BA", "bin"),
+           ESfM_Data (ALL)
+          );
     }
   }
   return !sfm_data_.structure.empty();
