@@ -119,15 +119,16 @@ namespace openMVG {
     };
 
 
-    template<typename T>
+
     struct Distributed_Extrinsics_Loss{
       const Extrinsic_Coes* coes;
-      const T* global_extrinsics;
-      const T* latent_extrinsics;
+      const double* global_extrinsics;
+      const double* latent_extrinsics;
 
-      explicit Distributed_Extrinsics_Loss(const Extrinsic_Coes* coes, const T* global_extrinsics, const T* latent_extrinsics):
+      explicit Distributed_Extrinsics_Loss(const Extrinsic_Coes* coes, const double* global_extrinsics, const double* latent_extrinsics):
           coes(coes),global_extrinsics(global_extrinsics),latent_extrinsics(latent_extrinsics){};
 
+      template<typename T>
       bool operator()(
           const T*const extrinsics,
           T* out_residuals
@@ -147,8 +148,8 @@ namespace openMVG {
       static ceres::CostFunction *Create
           (
               const Extrinsic_Coes* coes,
-              const T* global_extrinsics,
-              const T* latent_extrinsics
+              const double* global_extrinsics,
+              const double* latent_extrinsics
           ){
         return
             (new ceres::AutoDiffCostFunction
@@ -158,15 +159,15 @@ namespace openMVG {
     };
 
 
-    template<typename T>
     struct Distributed_Intrinsics_Loss{
       const Intrinsic_Coes* coes;
-      const T* global_intrinsics;
-      const T* latent_intrinsics;
+      const double* global_intrinsics;
+      const double* latent_intrinsics;
 
-      explicit Distributed_Intrinsics_Loss(const Intrinsic_Coes* coes, const T* global_intrinsics, const T* latent_intrinsics):
+      explicit Distributed_Intrinsics_Loss(const Intrinsic_Coes* coes, const double* global_intrinsics, const double* latent_intrinsics):
           coes(coes),global_intrinsics(global_intrinsics),latent_intrinsics(latent_intrinsics){};
 
+      template<typename T>
       bool operator()(
           const T*const intrinsics,
           T* out_residuals
@@ -186,8 +187,8 @@ namespace openMVG {
       static ceres::CostFunction *Create
           (
               const Intrinsic_Coes* coes,
-              const T* global_intrinsics,
-              const T* latent_intrinsics
+              const double* global_intrinsics,
+              const double* latent_intrinsics
           ){
         return
             (new ceres::AutoDiffCostFunction

@@ -254,7 +254,7 @@ namespace openMVG {
         }
         auto& pose_global = global_poses[pose_id];
         auto& pose_latent = latent_poses[pose_id];
-        ceres::CostFunction *extrinsic_cost = Distributed_Extrinsics_Loss<double>::Create(extrinsic_coes, &pose_global[0], &pose_latent[0]);
+        ceres::CostFunction *extrinsic_cost = Distributed_Extrinsics_Loss::Create(extrinsic_coes, &pose_global[0], &pose_latent[0]);
         problem.AddResidualBlock(extrinsic_cost,
                                  nullptr,
                                  &pose_it.second[0]);
@@ -269,7 +269,7 @@ namespace openMVG {
           }
           auto& intrinsic_global = global_intrinsics[intrinsic_id];
           auto& intrinsic_latent = latent_intrinsics[intrinsic_id];
-          ceres::CostFunction *intrinsic_cost = Distributed_Intrinsics_Loss<double>::Create(intrinsic_coes, &intrinsic_global[0], &intrinsic_latent[0]);
+          ceres::CostFunction *intrinsic_cost = Distributed_Intrinsics_Loss::Create(intrinsic_coes, &intrinsic_global[0], &intrinsic_latent[0]);
           problem.AddResidualBlock(intrinsic_cost,
                                    nullptr,
                                    &intrinsic_it.second[0]);
