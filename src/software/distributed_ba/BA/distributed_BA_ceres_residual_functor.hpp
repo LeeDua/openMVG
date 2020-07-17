@@ -68,11 +68,11 @@ namespace openMVG {
           const T *const pos_3dpoint,
           T *out_residuals) const {
 
-        Matrix<T, 3, 3> R;
+        Eigen::Matrix<T, 3, 3> R;
         ceres::AngleAxisToRotationMatrix((const T*)(cam_extrinsics), R.data());
-        Eigen::Map<Matrix<T, 3, 1>>  cam_c(&cam_extrinsics[3]);
-        Eigen::Map<Matrix<T, 3, 1>>  point3d(&pos_3dpoint[0]);
-        Matrix<T, 3, 1> trans_point = R * ( point3d - cam_c);
+        Eigen::Map<Eigen::Matrix<T, 3, 1>>  cam_c(&cam_extrinsics[3]);
+        Eigen::Map<Eigen::Matrix<T, 3, 1>>  point3d(&pos_3dpoint[0]);
+        Eigen::Matrix<T, 3, 1> trans_point = R * ( point3d - cam_c);
 
         // Transform the point from homogeneous to euclidean (undistorted point)
         const Eigen::Matrix<T, 2, 1> projected_point = trans_point.hnormalized();
