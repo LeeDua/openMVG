@@ -69,11 +69,11 @@ namespace openMVG {
           T *out_residuals) const {
 
         Mat3 R;
-        ceres::AngleAxisToRotationMatrix(cam_extrinsics, R.data());
-        Vec3  cam_c(cam_extrinsics[3],cam_extrinsics[4],cam_extrinsics[5]);
-        Vec3  point3d(pos_3dpoint[0],pos_3dpoint[1],pos_3dpoint[2]);
-        Vec3 trans_point = R * ( point3d - center);
-        Eigen::Matrix<T, 3, 1> transformed_point(trans_point[0], trans_point[1], trans_point[2]);
+        ceres::AngleAxisToRotationMatrix((const T*)(cam_extrinsics), R.data());
+        Vec3  cam_c(T(cam_extrinsics[3]),T(cam_extrinsics[4]),T(cam_extrinsics[5]));
+        Vec3  point3d(T(pos_3dpoint[0]),T(pos_3dpoint[1]),T(pos_3dpoint[2]));
+        Vec3 trans_point = R * ( point3d - cam_c);
+        Eigen::Matrix<T, 3, 1> transformed_point(&trans_point[0]);
 
         // Transform the point from homogeneous to euclidean (undistorted point)
         const Eigen::Matrix<T, 2, 1> projected_point = transformed_point.hnormalized();
@@ -133,8 +133,7 @@ namespace openMVG {
           const T*const extrinsics,
           T* out_residuals
       )const{
-        Eigen::Map<Eigen::Matrix<T, 6, 1>> residuals(out_residuals)
-          << (extrinsics[0] - global_extrinsics[0] + latent_extrinsics[0]) * sqrt(coes->rho_r),
+        Eigen::Map<Eigen::Matrix<T, 6, 1>> residuals(out_residuals) << (extrinsics[0] - global_extrinsics[0] + latent_extrinsics[0]) * sqrt(coes->rho_r),
           << (extrinsics[1] - global_extrinsics[1] + latent_extrinsics[1]) * sqrt(coes->rho_r),
           << (extrinsics[2] - global_extrinsics[2] + latent_extrinsics[2]) * sqrt(coes->rho_r),
           << (extrinsics[3] - global_extrinsics[3] + latent_extrinsics[3]) * sqrt(coes->rho_c),
@@ -172,8 +171,7 @@ namespace openMVG {
           const T*const intrinsics,
           T* out_residuals
       )const{
-        Eigen::Map<Eigen::Matrix<T, 6, 1>> residuals(out_residuals)
-          << (intrinsics[OFFSET_FOCAL_LENGTH] - global_intrinsics[OFFSET_FOCAL_LENGTH] + latent_intrinsics[OFFSET_FOCAL_LENGTH]) * sqrt(coes->rho_f),
+        Eigen::Map<Eigen::Matrix<T, 6, 1>> residuals(out_residuals) << (intrinsics[OFFSET_FOCAL_LENGTH] - global_intrinsics[OFFSET_FOCAL_LENGTH] + latent_intrinsics[OFFSET_FOCAL_LENGTH]) * sqrt(coes->rho_f),
           << (intrinsics[OFFSET_PRINCIPAL_POINT_X] - global_intrinsics[OFFSET_PRINCIPAL_POINT_X] + latent_intrinsics[OFFSET_PRINCIPAL_POINT_X]) * sqrt(coes->rho_uv),
           << (intrinsics[OFFSET_PRINCIPAL_POINT_Y] - global_intrinsics[OFFSET_PRINCIPAL_POINT_Y] + latent_intrinsics[OFFSET_PRINCIPAL_POINT_Y]) * sqrt(coes->rho_uv),
           << (intrinsics[OFFSET_DISTO_K1] - global_intrinsics[OFFSET_DISTO_K1] + latent_intrinsics[OFFSET_DISTO_K1]) * sqrt(coes->rho_d),
