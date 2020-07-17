@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
         std::cerr << "Should specify partition count with value > 0, current K:" << K << std::endl;
     }
 
-    if (!Load(sfm_data, stlplus::create_filespec(sDataDir, "sfm_data.bin"), ESfM_Data(ALL))) {
+    if (!Load(sfm_data, sDataDir, ESfM_Data(ALL))) {
         std::cerr << std::endl
                   << "The input SfM_Data file \"" << "\" cannot be read." << std::endl;
         return EXIT_FAILURE;
