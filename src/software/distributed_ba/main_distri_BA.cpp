@@ -120,6 +120,11 @@ int main(int argc, char **argv)
       total_obs,
       global_data.structure.size()
       );
+  std::cout << "Input scene:" << std::endl
+    << "#intrins: " << global_params.total_intrinsics << std::endl
+    << "#poses: " << global_params.total_poses << std::endl
+    << "obs: " << global_params.total_observations << std::endl
+    << "#tracks: "<< global_params.total_tracks << std::endl;
   double QN_ratio = double(global_params.total_observations) / global_params.total_poses;
   Intrinsic_Coes intrinsic_coes(
       1e-3*QN_ratio,
