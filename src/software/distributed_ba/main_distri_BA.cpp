@@ -128,7 +128,7 @@ int main(int argc, char **argv)
       1e5*QN_ratio
       );
   Distributed_Bundle_Adjustment_Ceres ba_obj(
-      global_data,
+      scene_data,
       &intrinsic_coes,
       &extrinsic_coes
       );
