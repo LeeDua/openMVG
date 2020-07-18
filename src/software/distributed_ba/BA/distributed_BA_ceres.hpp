@@ -34,6 +34,7 @@ namespace openMVG {
         bool bCeres_summary_;
         int linear_solver_type_;
         int preconditioner_type_;
+        int visibility_clustering_type_;
         int sparse_linear_algebra_library_type_;
         double parameter_tolerance_;
         bool bUse_loss_function_;

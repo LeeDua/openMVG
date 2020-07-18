@@ -57,22 +57,18 @@ namespace openMVG {
 
       bCeres_summary_ = true;
 
-      // Default configuration use a DENSE representation
-      linear_solver_type_ = ceres::DENSE_SCHUR;
-      preconditioner_type_ = ceres::JACOBI;
       // If Sparse linear solver are available
       // Descending priority order by efficiency (SUITE_SPARSE > CX_SPARSE > EIGEN_SPARSE)
       if (ceres::IsSparseLinearAlgebraLibraryTypeAvailable(ceres::SUITE_SPARSE)) {
         sparse_linear_algebra_library_type_ = ceres::SUITE_SPARSE;
-        linear_solver_type_ = ceres::SPARSE_SCHUR;
+        linear_solver_type_ = ceres::ITERATIVE_SCHUR;
+        preconditioner_type_ = ceres::CLUSTER_JACOBI;
+//        preconditioner_type_ = ceres::CLUSTER_TRIDIAGONAL;
+        visibility_clustering_type_ = ceres::SINGLE_LINKAGE;
+//        visibility_clustering_type_ = ceres::CANONICAL_VIEWS;
       } else {
-        if (ceres::IsSparseLinearAlgebraLibraryTypeAvailable(ceres::CX_SPARSE)) {
-          sparse_linear_algebra_library_type_ = ceres::CX_SPARSE;
-          linear_solver_type_ = ceres::SPARSE_SCHUR;
-        } else if (ceres::IsSparseLinearAlgebraLibraryTypeAvailable(ceres::EIGEN_SPARSE)) {
-          sparse_linear_algebra_library_type_ = ceres::EIGEN_SPARSE;
-          linear_solver_type_ = ceres::SPARSE_SCHUR;
-        }
+        std::cerr << "SUITSPARSE NOT SUPPORTED!" << std::endl;
+        exit(-1);
       }
     }
 
@@ -315,6 +311,8 @@ namespace openMVG {
       ceres_config_options.max_num_iterations = 500;
       ceres_config_options.preconditioner_type =
           static_cast<ceres::PreconditionerType>(ceres_options_.preconditioner_type_);
+      ceres_config_options.visibility_clustering_type =
+          static_cast<ceres::VisibilityClusteringType>(ceres_options_.visibility_clustering_type_);
       ceres_config_options.linear_solver_type =
           static_cast<ceres::LinearSolverType>(ceres_options_.linear_solver_type_);
       ceres_config_options.sparse_linear_algebra_library_type =
