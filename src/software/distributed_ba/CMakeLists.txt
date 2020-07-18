@@ -16,3 +16,13 @@ target_compile_definitions(subscene_export
         PRIVATE -DTHIS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_subdirectory(BA)
+
+add_executable(main_distributed_BA main_distri_BA.cpp)
+target_link_libraries(main_distributed_BA
+        distributed_ba
+        openMVG_sfm
+        openMVG_system
+        ${STLPLUS_LIBRARY}
+)
+target_compile_definitions(main_distributed_BA
+        PRIVATE -DTHIS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
