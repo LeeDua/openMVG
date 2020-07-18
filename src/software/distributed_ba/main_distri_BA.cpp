@@ -76,6 +76,9 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
+  string basename = stlplus::basename_part(sSfM_Data_Filename);
+  std::cout << "Input scene: " << basename << std::endl;
+
   // Load input SfM_Data scene
   SfM_Data scene_data;
   SfM_Data global_data;
@@ -140,10 +143,30 @@ int main(int argc, char **argv)
       Control_Point_Parameter(0.0, false),
       false
       );
-  ba_obj.Adjust(
-      scene_data,
-      optimize_opt
-      );
+
+  if(
+    ba_obj.Adjust(
+        scene_data,
+        optimize_opt
+    )
+      ){
+
+    std::cout << std::endl << " Total BA took (s): " << timer.elapsed() << std::endl;
+    Save(scene_data,
+         stlplus::create_filespec(sOutDir, "bin_" + basename, ".bin"),
+         ESfM_Data(ALL));
+    Save(scene_data,
+         stlplus::create_filespec(sOutDir, "structure_" + basename, ".ply"),
+         ESfM_Data(STRUCTURE));
+    Save(scene_data,
+         stlplus::create_filespec(sOutDir, "cam_" + basename, ".ply"),
+         ESfM_Data(EXTRINSICS));
+
+  }
+  else{
+    std::cerr << "distributed BA failed" << std::endl;
+  }
+
 
 
 
