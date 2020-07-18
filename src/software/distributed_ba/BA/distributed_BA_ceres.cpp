@@ -55,7 +55,7 @@ namespace openMVG {
       if (!bmultithreaded)
         nb_threads_ = 1;
 
-      bCeres_summary_ = false;
+      bCeres_summary_ = true;
 
       // Default configuration use a DENSE representation
       linear_solver_type_ = ceres::DENSE_SCHUR;
@@ -295,7 +295,7 @@ namespace openMVG {
       // Configure a BA engine and run it
       //  Make Ceres automatically detect the bundle structure.
       ceres::Solver::Options ceres_config_options;
-      ceres_config_options.max_num_iterations = 500;
+      ceres_config_options.max_num_iterations = 10000;
       ceres_config_options.preconditioner_type =
           static_cast<ceres::PreconditionerType>(ceres_options_.preconditioner_type_);
       ceres_config_options.linear_solver_type =
@@ -303,7 +303,7 @@ namespace openMVG {
       ceres_config_options.sparse_linear_algebra_library_type =
           static_cast<ceres::SparseLinearAlgebraLibraryType>(ceres_options_.sparse_linear_algebra_library_type_);
       ceres_config_options.minimizer_progress_to_stdout = ceres_options_.bVerbose_;
-      ceres_config_options.logging_type = ceres::SILENT;
+      ceres_config_options.logging_type = ceres::PER_MINIMIZER_ITERATION;
       ceres_config_options.num_threads = ceres_options_.nb_threads_;
 #if CERES_VERSION_MAJOR < 2
       ceres_config_options.num_linear_solver_threads = ceres_options_.nb_threads_;
