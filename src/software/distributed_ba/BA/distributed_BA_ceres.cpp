@@ -311,8 +311,11 @@ namespace openMVG {
       ceres_config_options.parameter_tolerance = ceres_options_.parameter_tolerance_;
 
       // Solve BA
+      std::cout << "Before actual ba calculation" << std::endl;
       ceres::Solver::Summary summary;
       ceres::Solve(ceres_config_options, &problem, &summary);
+      std::cout << "End ba calculation" << std::endl;
+
       if (ceres_options_.bCeres_summary_)
         std::cout << summary.FullReport() << std::endl;
 
