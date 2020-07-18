@@ -15,27 +15,19 @@ target_compile_features(distributed_ba INTERFACE ${CXX11_FEATURES})
 target_link_libraries(distributed_ba
     PUBLIC
         openMVG_sfm
-        openMVG_geometry
-        openMVG_features
-        openMVG_graph
-        openMVG_matching
-        openMVG_multiview
+        openMVG_system
         cereal
         ${OPENMVG_LIBRARY_DEPENDENCIES}
 )
 
 target_link_libraries(distributed_ba
-    LINK_PRIVATE
+    LINK_PUBLIC
         ${CERES_LIBRARIES}
-        openMVG_graph
-        openMVG_image
-        openMVG_lInftyComputerVision
-        openMVG_system
         ${STLPLUS_LIBRARY}
 )
 
 target_include_directories(distributed_ba
-    PRIVATE
+    PUBLIC
     ${CERES_INCLUDE_DIRS}
     PUBLIC
         $<INSTALL_INTERFACE:include>
