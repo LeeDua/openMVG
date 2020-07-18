@@ -160,8 +160,8 @@ if (IOS)
   update_cache_variable(MINIGLOG ON)
   message(STATUS "Building for iOS: Forcing use of miniglog instead of glog.")
 
-  update_cache_variable(SUITESPARSE OFF)
-  update_cache_variable(CXSPARSE ON)
+  update_cache_variable(SUITESPARSE ON)
+  update_cache_variable(CXSPARSE OFF)
   update_cache_variable(GFLAGS OFF)
   update_cache_variable(OPENMP OFF)
   # Apple claims that the BLAS call dsyrk_ is a private API, and will not allow
