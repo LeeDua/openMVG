@@ -97,6 +97,8 @@ namespace openMVG {
 
             const Optimize_Options &options
         ) {
+
+      std::cout << "BA adjust start" << std::endl;
       //----------
       // Add camera parameters
       // - intrinsics
@@ -166,6 +168,9 @@ namespace openMVG {
         }
       }
 
+      std::cout << "initialization done" << std::endl;
+
+
       // Setup Intrinsics data & subparametrization
       for (const auto &intrinsic_it : sfm_data.intrinsics) {
         const IndexT indexCam = intrinsic_it.first;
@@ -194,6 +199,9 @@ namespace openMVG {
           return false;
         }
       }
+
+      std::cout << "intrinsic parameterization done" << std::endl;
+
 
       // Set a LossFunction to be less penalized by false measurements
       //  - set it to nullptr if you don't want use a lossFunction.
@@ -247,6 +255,9 @@ namespace openMVG {
           //          problem.SetParameterBlockConstant(structure_landmark_it.second.X.data());
       }
 
+      std::cout << "reprojection loss added" << std::endl;
+
+
       if(false){
         //single scene test, skip extrinsic cost
         for (auto &pose_it : map_poses){
@@ -264,6 +275,9 @@ namespace openMVG {
         }
       }
 
+      std::cout << "extrinsic loss configured" << std::endl;
+
+
 
       if(options.intrinsics_opt != Intrinsic_Parameter_Type::NONE){
         for (auto &intrinsic_it : map_intrinsics){
@@ -279,6 +293,8 @@ namespace openMVG {
                                    &intrinsic_it.second[0]);
         }
       }
+
+      std::cout << "intrinsic loss configured" << std::endl;
 
 
       if (options.control_point_opt.bUse_control_points) {
