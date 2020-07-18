@@ -247,19 +247,23 @@ namespace openMVG {
           //          problem.SetParameterBlockConstant(structure_landmark_it.second.X.data());
       }
 
-      for (auto &pose_it : map_poses){
-        IndexT pose_id = pose_it.first;
-        if(global_poses.find(pose_id) == global_poses.end()){
-          std::cerr << "global_poses do not contain pose " << pose_id << std::endl;
-        }
-        auto& pose_global = global_poses[pose_id];
-        auto& pose_latent = latent_poses[pose_id];
-        ceres::CostFunction *extrinsic_cost = Distributed_Extrinsics_Loss::Create(extrinsic_coes, &pose_global[0], &pose_latent[0]);
-        problem.AddResidualBlock(extrinsic_cost,
-                                 nullptr,
-                                 &pose_it.second[0]);
+      if(false){
+        //single scene test, skip extrinsic cost
+        for (auto &pose_it : map_poses){
+          IndexT pose_id = pose_it.first;
+          if(global_poses.find(pose_id) == global_poses.end()){
+            std::cerr << "global_poses do not contain pose " << pose_id << std::endl;
+          }
+          auto& pose_global = global_poses[pose_id];
+          auto& pose_latent = latent_poses[pose_id];
+          ceres::CostFunction *extrinsic_cost = Distributed_Extrinsics_Loss::Create(extrinsic_coes, &pose_global[0], &pose_latent[0]);
+          problem.AddResidualBlock(extrinsic_cost,
+                                   nullptr,
+                                   &pose_it.second[0]);
 
+        }
       }
+
 
       if(options.intrinsics_opt != Intrinsic_Parameter_Type::NONE){
         for (auto &intrinsic_it : map_intrinsics){
