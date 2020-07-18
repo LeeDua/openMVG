@@ -1,5 +1,6 @@
 .idea
 .vscode
+localResults
 src/cmake-build-debug
 *.log
 *.aux
