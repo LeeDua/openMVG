@@ -78,6 +78,12 @@ option(CUSTOM_BLAS
        ON)
 # Multithreading using OpenMP
 option(OPENMP "Enable threaded solving in Ceres (requires OpenMP)" ON)
+
+message(STATUS "--!! INIT: current lapack & suitsparse value ${LAPACK} ${SUITESPARSE}")
+
+
+
+
 # Enable the use of Eigen as a sparse linear algebra library for
 # solving the nonlinear least squares problems. Enabling this
 # option will result in an LGPL licensed version of Ceres Solver
