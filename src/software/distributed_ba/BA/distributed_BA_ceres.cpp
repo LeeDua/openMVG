@@ -107,7 +107,7 @@ namespace openMVG {
       //----------
 
       bool b_usable_prior = false;
-      if (options.use_motion_priors_opt && sfm_data.GetViews().size() > 3) {
+      if (options.use_motion_priors_opt) {
         std::cerr << "In distributed ba, use motion priors, not implemented" << std::endl;
         return false;
       }
@@ -343,10 +343,10 @@ namespace openMVG {
 
             Mat3 R_refined;
             ceres::AngleAxisToRotationMatrix(&map_poses.at(indexPose)[0], R_refined.data());
-            Vec3 t_refined(map_poses.at(indexPose)[3], map_poses.at(indexPose)[4], map_poses.at(indexPose)[5]);
+            Vec3 C_refined(map_poses.at(indexPose)[3], map_poses.at(indexPose)[4], map_poses.at(indexPose)[5]);
             // Update the pose
             Pose3 &pose = pose_it.second;
-            pose = Pose3(R_refined, -R_refined.transpose() * t_refined);
+            pose = Pose3(R_refined, C_refined);
           }
         }
 
