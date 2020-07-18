@@ -160,8 +160,8 @@ if (IOS)
   update_cache_variable(MINIGLOG ON)
   message(STATUS "Building for iOS: Forcing use of miniglog instead of glog.")
 
-  update_cache_variable(SUITESPARSE ON)
-  update_cache_variable(CXSPARSE OFF)
+  update_cache_variable(SUITESPARSE OFF)
+  update_cache_variable(CXSPARSE ON)
   update_cache_variable(GFLAGS OFF)
   update_cache_variable(OPENMP OFF)
   # Apple claims that the BLAS call dsyrk_ is a private API, and will not allow
@@ -249,6 +249,9 @@ if (SUITESPARSE AND NOT LAPACK)
     "turn ON LAPACK to enable (optional) building with SuiteSparse.")
   update_cache_variable(SUITESPARSE OFF)
 endif (SUITESPARSE AND NOT LAPACK)
+
+message("--!! Should show this message")
+message("--!! current suitsparse value ${SUITESPARSE}")
 if (SUITESPARSE)
   # By default, if SuiteSparse and all dependencies are found, Ceres is
   # built with SuiteSparse support.
