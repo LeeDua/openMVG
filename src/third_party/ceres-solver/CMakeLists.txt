@@ -252,6 +252,7 @@ endif (SUITESPARSE AND NOT LAPACK)
 if (SUITESPARSE)
   # By default, if SuiteSparse and all dependencies are found, Ceres is
   # built with SuiteSparse support.
+  message("--!! Ceres solver: Looking for SuiteSparse.")
 
   # Check for SuiteSparse and dependencies.
   find_package(SuiteSparse)
