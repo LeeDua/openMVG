@@ -66,7 +66,10 @@ enable_testing()
 
 option(MINIGLOG "Use a stripped down version of glog." ON)
 option(GFLAGS "Enable Google Flags." OFF)
+
 option(SUITESPARSE "Enable SuiteSparse." ON)
+message(STATUS "--!! INIT: current suitsparse value ${SUITESPARSE}")
+
 option(CXSPARSE "Enable CXSparse." OFF)
 option(LAPACK "Enable use of LAPACK." ON)
 # Template specializations for the Schur complement based solvers. If
