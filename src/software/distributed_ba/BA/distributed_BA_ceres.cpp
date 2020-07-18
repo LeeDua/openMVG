@@ -249,10 +249,11 @@ namespace openMVG {
             return false;
           }
         }
-        if (options.structure_opt == Structure_Parameter_Type::NONE)
+        if (options.structure_opt == Structure_Parameter_Type::NONE){
           std::cerr << "structure_opt set to NONE, illegal" << std::endl;
           return false;
           //          problem.SetParameterBlockConstant(structure_landmark_it.second.X.data());
+        }
       }
 
       std::cout << "reprojection loss added" << std::endl;
