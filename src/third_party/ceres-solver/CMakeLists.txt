@@ -215,6 +215,7 @@ if (EIGEN_FOUND)
     message("")
 endif (EIGEN_FOUND)
 
+message(STATUS "--!! BEFORE LAPACK: current lapack & suitsparse value ${LAPACK} ${SUITESPARSE}")
 # LAPACK (& BLAS).
 if (LAPACK)
   find_package(LAPACK QUIET)
@@ -240,6 +241,7 @@ else (LAPACK)
   list(APPEND CERES_COMPILE_OPTIONS CERES_NO_LAPACK)
 endif (LAPACK)
 
+message(STATUS "--!! AFTER LAPACK: current lapack & suitsparse value ${LAPACK} ${SUITESPARSE}")
 # SuiteSparse.
 if (SUITESPARSE AND NOT LAPACK)
   # If user has disabled LAPACK, but left SUITESPARSE ON, turn it OFF,
@@ -250,12 +252,11 @@ if (SUITESPARSE AND NOT LAPACK)
   update_cache_variable(SUITESPARSE OFF)
 endif (SUITESPARSE AND NOT LAPACK)
 
-message("--!! Should show this message")
-message("--!! current suitsparse value ${SUITESPARSE}")
+message(STATUS "--!! BEFORE SUITSPARSE: current lapack & suitsparse value ${LAPACK} ${SUITESPARSE}")
 if (SUITESPARSE)
   # By default, if SuiteSparse and all dependencies are found, Ceres is
   # built with SuiteSparse support.
-  message("--!! Ceres solver: Looking for SuiteSparse.")
+  message(STATUS "--!! Ceres solver: Looking for SuiteSparse.")
 
   # Check for SuiteSparse and dependencies.
   find_package(SuiteSparse)
