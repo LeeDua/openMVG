@@ -152,5 +152,33 @@ int main(int argc, char **argv) {
     }
     logStream.close();
 
+    // generate pose and intrinsic group for distributed computation exchange
+
+    for(int i=0; i<subScenes.size(); i++){
+      vector<std::pair<uint32_t,vector<uint32_t>>> groups;
+      for(auto& pose_it: subScenes[i].poses){
+        uint32_t pose_id = pose_it.first;
+        vector<uint32_t> group;
+        group.emplace_back(i);
+        for(int j=0; j < subScenes.size(); j++){
+          if(j==i) continue;
+          if(subScenes[j].poses.count(pose_id)!=0){
+            group.emplace_back(j);
+          }
+        }
+        groups.emplace_back(std::make_pair(pose_id, group));
+      }
+      std::ofstream groupStream;
+      groupStream.open(stlplus::create_filespec(sOutDir,"group_" + to_string(i) + ".txt" ).c_str());
+      for(auto& g_it: groups){
+        groupStream << g_it.first << " ";
+        for(auto subScene_id: g_it.second){
+          groupStream << subScene_id << " ";
+        }
+        groupStream << std::endl;
+      }
+      groupStream.close();
+    }
+
     return EXIT_SUCCESS;
 }
