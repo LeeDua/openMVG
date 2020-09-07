@@ -14,6 +14,8 @@
 
 #endif
 
+#include <mpi.h>
+
 #include "ceres/problem.h"
 #include "ceres/solver.h"
 #include "openMVG/cameras/Camera_Common.hpp"
@@ -29,9 +31,14 @@
 
 #include <ceres/rotation.h>
 #include <ceres/types.h>
+#include "third_party/stlplus3/filesystemSimplified/file_system.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <vector>
 #include <limits>
+
+using namespace std;
 
 namespace openMVG {
   namespace sfm {
@@ -93,6 +100,45 @@ namespace openMVG {
 
             const Optimize_Options &options
         ) {
+
+      MPI_Init(NULL, NULL);
+      int world_rank;
+      MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+      int world_size;
+      MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+      MPI_Group world_group;
+      MPI_Comm_group(MPI_COMM_WORLD, &world_group);
+
+      ifstream groupStream;
+      map<uint32_t, vector<int>> groups;
+      map<uint32_t, MPI_Comm*> com_map;
+      string groupDir("");
+      groupStream.open(stlplus::create_filespec(groupDir,"group_" + to_string(world_rank) + ".txt"));
+      if(groupStream.fail()){
+        std::cerr << std::endl << "Input group txt file do not exist, id:" << world_rank << std::endl;
+        groupStream.close();
+        return EXIT_FAILURE;
+      }
+      uint32_t pose_id, comm_id;
+      string line;
+      while(std::getline(groupStream, line)){
+        std::stringstream ls(line);
+        ls >> pose_id;
+        while(ls >> comm_id){
+          groups[pose_id].emplace_back(comm_id);
+        }
+      }
+      for(auto& ex_it: groups){
+        MPI_Group* g = new MPI_Group();
+        MPI_Group_incl(world_group, ex_it.second.size(), &ex_it.second[0], g);
+        MPI_Comm* comm = new MPI_Comm();
+        MPI_Comm_create_group(MPI_COMM_WORLD, *g, 0, comm);
+        com_map[ex_it.first] = comm;
+      }
+
+
+      //read mpi group info
+
 
       std::cout << "BA adjust start" << std::endl;
       //----------
