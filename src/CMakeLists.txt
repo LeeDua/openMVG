@@ -121,6 +121,24 @@ else (CXX11_COMPILER)
   message(FATAL_ERROR "A CXX11 compiler is required.")
 endif (CXX11_COMPILER)
 
+
+
+# ==============================================================================
+# mpi detection
+# ==============================================================================
+#find_package(MPI REQUIRED)
+#message(STATUS "MPI FOUND: ${MPI_FOUND}, MPI_CXX_FOND: ${MPI_CXX_FOUND}, MPI_CXX_COMPILER: ${MPI_CXX_COMPILER}")
+#message(STATUS "Using MPI_CXX_INCLUDE_PATH: ${MPI_CXX_INCLUDE_PATH}")
+#message(STATUS "Using MPI_CXX_LIBRARIES: ${MPI_CXX_LIBRARIES}")
+#set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_CXX_COMPILE_OPTIONS})
+#set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_CXX_LINK_FLAGS})
+##add_compile_options(MPI_CXX_COMPILE_OPTIONS)
+#include_directories(SYSTEM ${MPI_CXX_INCLUDE_DIRS})
+
+
+
+
+
 # ==============================================================================
 # OpenMP detection
 # ==============================================================================

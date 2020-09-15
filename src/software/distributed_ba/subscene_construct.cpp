@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
         groups.emplace_back(std::make_pair(pose_id, group));
       }
       std::ofstream groupStream;
-      groupStream.open(stlplus::create_filespec(sOutDir,"group_" + to_string(i) + ".txt" ).c_str());
+      groupStream.open(stlplus::create_filespec(sOutDir,"groups/group_" + to_string(i) + ".txt" ).c_str());
       for(auto& g_it: groups){
         groupStream << g_it.first << " ";
         for(auto subScene_id: g_it.second){

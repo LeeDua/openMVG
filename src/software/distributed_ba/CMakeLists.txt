@@ -15,6 +15,8 @@ target_link_libraries(subscene_export
 target_compile_definitions(subscene_export
         PRIVATE -DTHIS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
+find_package(MPI REQUIRED)
+include_directories(${MPI_INCLUDE_PATH})
 add_subdirectory(BA)
 
 add_executable(main_distributed_BA main_distri_BA.cpp)
@@ -24,4 +26,16 @@ target_link_libraries(main_distributed_BA
         openMVG_system
         openMVG_sfm
         ${STLPLUS_LIBRARY}
+        ${MPI_LIBRARIES}
         )
+
+
+if(MPI_COMPILE_FLAGS)
+    set_target_properties(main_distributed_BA PROPERTIES
+            COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
+endif()
+
+if(MPI_LINK_FLAGS)
+    set_target_properties(main_distributed_BA PROPERTIES
+            LINK_FLAGS "${MPI_LINK_FLAGS}")
+endif()

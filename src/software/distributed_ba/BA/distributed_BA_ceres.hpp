@@ -25,7 +25,6 @@ namespace openMVG {
 /// Can be residual cost functor can be weighetd if desired (default 0.0 means no weight).
     class Distributed_Bundle_Adjustment_Ceres : public Bundle_Adjustment {
     public:
-      SfM_Data& global_scene;
       Intrinsic_Coes* intrinsic_coes;
       Extrinsic_Coes* extrinsic_coes;
       struct BA_Ceres_options {
@@ -49,7 +48,6 @@ namespace openMVG {
     public:
       explicit Distributed_Bundle_Adjustment_Ceres
           (
-              SfM_Data& global_scene,
               Intrinsic_Coes* intrinsic_coes,
               Extrinsic_Coes* extrinsic_coes,
               const Distributed_Bundle_Adjustment_Ceres::BA_Ceres_options &options =
@@ -60,8 +58,7 @@ namespace openMVG {
 
       bool Adjust
           (
-              // the SfM scene to refine
-              sfm::SfM_Data &sfm_data,
+              SfM_Data& sfm_data,
               // tell which parameter needs to be adjusted
               const Optimize_Options &options
           ) override;
