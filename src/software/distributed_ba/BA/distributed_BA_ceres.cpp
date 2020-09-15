@@ -145,19 +145,20 @@ namespace openMVG {
         int sum = 0;
         int com_size;
         if(com_it.second == MPI_COMM_NULL){
-          std::cout << "Sub partition " << world_rank << " do not have cam" << com_it.first << std::endl;
+          std::cout << "";
+//          std::cout << "Sub partition " << world_rank << " do not have cam" << com_it.first << std::endl;
         }
         else{
           MPI_Comm_size(com_it.second, &com_size);
           if(com_size == 1){
-            std::cout << "Sub partition " << world_rank << " have single cam" << com_it.first << std::endl;
+            std::cout << "Cam " << com_it.first << " (single) of partition " << world_rank << std::endl;
           }
           else{
             MPI_Allreduce(&ex_id, &sum, 1, MPI_INT, MPI_SUM,
                           com_it.second);
             float average = sum * 1.0 / com_size;
-            std::cout << "Sub partition " << world_rank << " average on cam" << com_it.first
-              << " --> " << average << std::endl;
+            std::cout << "Cam " << com_it.first << " (" << com_size << ") of partition " << world_rank
+              << " average to " << average << std::endl;
           }
         }
       }
