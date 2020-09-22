@@ -8,8 +8,9 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <set>
+#include <map>
 #include <openMVG/sfm/sfm.hpp>
-
 #include "openMVG/sfm/sfm_data.hpp"
 #include "openMVG/sfm/sfm_data_io.hpp"
 #include "openMVG/types.hpp"
@@ -30,20 +31,20 @@ int main(int argc, char **argv) {
     SfM_Data sfm_data;
 
     CmdLine cmd;
-    cmd.add( make_option('i', sDataDir, "sfm_data_dir") );
-    cmd.add( make_option('g', sGraphDir, "graph_file") );
-    cmd.add( make_option('m', sLandmarkMapDir, "landmark_map_file") );
-    cmd.add( make_option('k', K, "partitions") );
-    cmd.add( make_option('o', sOutDir, "out_dir") );
+    cmd.add(make_option('i', sDataDir, "sfm_data_dir"));
+    cmd.add(make_option('g', sGraphDir, "graph_file"));
+    cmd.add(make_option('m', sLandmarkMapDir, "landmark_map_file"));
+    cmd.add(make_option('k', K, "partitions"));
+    cmd.add(make_option('o', sOutDir, "out_dir"));
 
     try {
         if (argc == 1) throw std::string("Invalid command line parameter.");
         cmd.process(argc, argv);
-    } catch (const std::string& s) {
+    } catch (const std::string &s) {
         return EXIT_FAILURE;
     }
 
-    if ( K <= 0 ){
+    if (K <= 0) {
         std::cerr << "Should specify partition count with value > 0, current K:" << K << std::endl;
     }
 
@@ -53,24 +54,24 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    std::map<uint32_t,uint32_t> trackMap;
+    std::map <uint32_t, uint32_t> trackMap;
     ifstream mapStream;
     mapStream.open(sLandmarkMapDir);
-    if(mapStream.fail()){
+    if (mapStream.fail()) {
         std::cerr << std::endl << "Input landmark map file do not exist" << std::endl;
         mapStream.close();
         return EXIT_FAILURE;
     }
     ifstream graphStream;
     graphStream.open(sGraphDir);
-    if(mapStream.fail()){
+    if (mapStream.fail()) {
         std::cerr << std::endl << "Input graph file do not exist" << std::endl;
         graphStream.close();
         return EXIT_FAILURE;
     }
 
     uint32_t from, to;
-    while(mapStream >> from >> to){
+    while (mapStream >> from >> to) {
         trackMap.emplace(std::make_pair(from, to));
     }
     mapStream.close();
@@ -82,67 +83,70 @@ int main(int argc, char **argv) {
 
     uint32_t vCount = 0;
     int partition = 0;
-    vector<SfM_Data> subScenes(K);
+    vector <SfM_Data> subScenes(K);
     //copy root path
-    for(auto& d : subScenes){
+    for (auto &d : subScenes) {
         d.s_root_path = sfm_data.s_root_path;
     }
-    while(graphStream >> partition){
-        if(vCount < numViews){
-            vCount ++;
+    while (graphStream >> partition) {
+        if (vCount < numViews) {
+            vCount++;
             //copy views during landmark copying
             continue;
         }
-        uint32_t trackId = trackMap[vCount+1];
+        uint32_t trackId = trackMap[vCount + 1];
         Landmark landmark = sfm_data.structure[trackId];
         subScenes[partition].structure.emplace(std::make_pair(trackId, landmark));
-        for(auto & obs_it : landmark.obs){
+        for (auto &obs_it : landmark.obs) {
             uint32_t view_id = obs_it.first;
-            Views& views = subScenes[partition].views;
-            if(views.find(view_id) == views.end()){
+            Views &views = subScenes[partition].views;
+            if (views.find(view_id) == views.end()) {
                 //copy view
-                views.emplace(std::make_pair(view_id,sfm_data.views[view_id]));
+                views.emplace(std::make_pair(view_id, sfm_data.views[view_id]));
                 //copy pose
                 subScenes[partition].poses.emplace(std::make_pair(view_id, sfm_data.poses[view_id]));
                 //copy intrinsic
                 uint32_t intrinsic_id = sfm_data.views[view_id]->id_intrinsic;
-                Intrinsics& intrinsics =  subScenes[partition].intrinsics;
-                if(intrinsics.find(intrinsic_id) ==intrinsics.end()){
+                Intrinsics &intrinsics = subScenes[partition].intrinsics;
+                if (intrinsics.find(intrinsic_id) == intrinsics.end()) {
                     intrinsics.emplace(std::make_pair(intrinsic_id, sfm_data.intrinsics[intrinsic_id]));
                 }
             }
         }
-        vCount ++;
+        vCount++;
     }
     graphStream.close();
     assert(vCount == numViews + numTracks);
 
-    std::string bin_path = stlplus::create_filespec(sOutDir,"binpartitions"+std::to_string(K));
-    std::string ply_path = stlplus::create_filespec(sOutDir,"plypartitions"+std::to_string(K));
+    std::string bin_path = stlplus::create_filespec(sOutDir, "binpartitions" + std::to_string(K));
+    std::string ply_path = stlplus::create_filespec(sOutDir, "plypartitions" + std::to_string(K));
 
-    if(!stlplus::folder_exists(bin_path)){
+    if (!stlplus::folder_exists(bin_path)) {
         stlplus::folder_create(bin_path);
     }
-    if(!stlplus::folder_exists(ply_path)){
+    if (!stlplus::folder_exists(ply_path)) {
         stlplus::folder_create(ply_path);
     }
     std::ofstream logStream(stlplus::create_filespec(bin_path, "stats.log"));
-    for(uint32_t i=0;i<subScenes.size();i++){
-        if(!Save(subScenes[i], stlplus::create_filespec(bin_path, "scene" + std::to_string(i) +".bin"),ESfM_Data::ALL)){
+    for (uint32_t i = 0; i < subScenes.size(); i++) {
+        if (!Save(subScenes[i], stlplus::create_filespec(bin_path, "scene" + std::to_string(i) + ".bin"),
+                  ESfM_Data::ALL)) {
             std::cerr << "Save subscene " << i << " bin failed" << std::endl;
         };
-        if(!Save(subScenes[i], stlplus::create_filespec(ply_path, "scene" + std::to_string(i) +".ply"),ESfM_Data::STRUCTURE)){
+        if (!Save(subScenes[i], stlplus::create_filespec(ply_path, "scene" + std::to_string(i) + ".ply"),
+                  ESfM_Data::STRUCTURE)) {
             std::cerr << "Save subscene " << i << " structure ply failed" << std::endl;
         };
-        if(!Save(subScenes[i], stlplus::create_filespec(ply_path, "cam" + std::to_string(i) +".ply"),ESfM_Data::EXTRINSICS)){
+        if (!Save(subScenes[i], stlplus::create_filespec(ply_path, "cam" + std::to_string(i) + ".ply"),
+                  ESfM_Data::EXTRINSICS)) {
             std::cerr << "Save subscene " << i << " camera ply failed" << std::endl;
         };
         int obCount = 0;
-        for(auto& landmark_iter: subScenes[i].structure){
+        for (auto &landmark_iter: subScenes[i].structure) {
             obCount += landmark_iter.second.obs.size();
         }
         logStream << "SCENE" << i << std::endl;
-        logStream << "rootPath " << " " <<  subScenes[i].s_root_path << std::endl;
+        logStream << "rootPath " << " " << subScenes[i].s_root_path << std::endl;
         logStream << "numViews " << " " << subScenes[i].views.size() << std::endl;
         logStream << "numPoses " << " " << subScenes[i].poses.size() << std::endl;
         logStream << "numIntrs " << " " << subScenes[i].intrinsics.size() << std::endl;
@@ -153,32 +157,45 @@ int main(int argc, char **argv) {
     logStream.close();
 
     // generate pose and intrinsic group for distributed computation exchange
-
-    for(int i=0; i<subScenes.size(); i++){
-      vector<std::pair<uint32_t,vector<uint32_t>>> groups;
-      for(auto& pose_it: subScenes[i].poses){
-        uint32_t pose_id = pose_it.first;
-        vector<uint32_t> group;
-        group.emplace_back(i);
-        for(int j=0; j < subScenes.size(); j++){
-          if(j==i) continue;
-          if(subScenes[j].poses.count(pose_id)!=0){
-            group.emplace_back(j);
-          }
+    std::map <uint32_t, std::set<int>> groups;
+    for (int i = 0; i < subScenes.size(); i++) {
+        for (auto &pose_it: subScenes[i].poses) {
+            uint32_t pose_id = pose_it.first;
+            if (groups.count(pose_id) == 0) {
+                groups[pose_id] = std::set<int>();
+            }
+            auto &group = groups[pose_id];
+            group.insert(i);
+            for (int j = 0; j < subScenes.size(); j++) {
+                if (j == i) continue;
+                if (subScenes[j].poses.count(pose_id) != 0) {
+                    group.insert(j);
+                }
+            }
         }
-        groups.emplace_back(std::make_pair(pose_id, group));
-      }
-      std::ofstream groupStream;
-      groupStream.open(stlplus::create_filespec(sOutDir,"groups/group_" + to_string(i) + ".txt" ).c_str());
-      for(auto& g_it: groups){
+    }
+    std::ofstream groupStream;
+    groupStream.open(stlplus::create_filespec(sOutDir, "group.txt").c_str());
+    for (auto &g_it: groups) {
         groupStream << g_it.first << " ";
-        for(auto subScene_id: g_it.second){
-          groupStream << subScene_id << " ";
+        for (auto subScene_id: g_it.second) {
+            groupStream << subScene_id << " ";
         }
         groupStream << std::endl;
-      }
-      groupStream.close();
     }
+    groupStream.close();
+
+    std::ofstream globalParamStream;
+    globalParamStream.open(stlplus::create_filespec(sOutDir, "global_params.txt").c_str());
+    int total_obs = 0;
+    for (auto &track_it: sfm_data.structure) {
+        total_obs += track_it.second.obs.size();
+    }
+    globalParamStream << sfm_data.intrinsics.size() << " "
+            << sfm_data.poses.size() << " "
+            << total_obs << " "
+            << sfm_data.structure.size() << std::endl;
+    globalParamStream.close();
 
     return EXIT_SUCCESS;
 }

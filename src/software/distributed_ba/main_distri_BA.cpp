@@ -82,30 +82,48 @@ int main(int argc, char **argv) {
     }
 
     // Load global SfM_Data for super param setup
-    SfM_Data global_data;
-
-    if (!Load(global_data, sGlobalBinFile, ESfM_Data(VIEWS | INTRINSICS | EXTRINSICS | STRUCTURE))) {
-        std::cerr << std::endl
-                  << "The input global SfM_Data file \"" << sGlobalBinFile << "\" cannot be read." << std::endl;
-        return EXIT_FAILURE;
+    ifstream globalParamStream;
+    globalParamStream.open(stlplus::create_filespec(sGlobalBinFile,"global_params.txt"));
+    if(globalParamStream.fail()){
+      std::cerr << "global params not provided" << std::endl;
+      globalParamStream.close();
+      return EXIT_FAILURE;
     }
+    int intrinsic_size, pose_size, total_size, structure_size;
+    globalParamStream >> intrinsic_size >> pose_size >> total_size >> structure_size;
+    globalParamStream.close();
 
-    int total_obs = 0;
-    for (auto &track_it: global_data.structure) {
-        total_obs += track_it.second.obs.size();
-    }
+    
+//    SfM_Data global_data;
+//
+//    if (!Load(global_data, sGlobalBinFile, ESfM_Data(VIEWS | INTRINSICS | EXTRINSICS | STRUCTURE))) {
+//        std::cerr << std::endl
+//                  << "The input global SfM_Data file \"" << sGlobalBinFile << "\" cannot be read." << std::endl;
+//        return EXIT_FAILURE;
+//    }
+//
+//    int total_obs = 0;
+//    for (auto &track_it: global_data.structure) {
+//        total_obs += track_it.second.obs.size();
+//    }
 
-    Global_Params global_params(
-            global_data.intrinsics.size(),
-            global_data.poses.size(),
-            total_obs,
-            global_data.structure.size()
-    );
-    std::cout << "Input scene:" << std::endl
-              << "#intrins: " << global_params.total_intrinsics << std::endl
-              << "#poses: " << global_params.total_poses << std::endl
-              << "obs: " << global_params.total_observations << std::endl
-              << "#tracks: " << global_params.total_tracks << std::endl;
+//    Global_Params global_params(
+//            global_data.intrinsics.size(),
+//            global_data.poses.size(),
+//            total_obs,
+//            global_data.structure.size()
+//    );
+      Global_Params global_params(
+          intrinsic_size,
+          pose_size,
+          total_size,
+          structure_size
+        );
+//    std::cout << "Input scene:" << std::endl
+//              << "#intrins: " << global_params.total_intrinsics << std::endl
+//              << "#poses: " << global_params.total_poses << std::endl
+//              << "obs: " << global_params.total_observations << std::endl
+//              << "#tracks: " << global_params.total_tracks << std::endl;
     double QN_ratio = double(global_params.total_observations) / global_params.total_poses;
     Intrinsic_Coes intrinsic_coes(
             1e-3 * QN_ratio,
@@ -124,13 +142,14 @@ int main(int argc, char **argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     SfM_Data scene_data;
     string sSceneFilename = stlplus::create_filespec(sInputBinDir, "scene" + std::to_string(world_rank) + ".bin");
-    std::cout << "Input scene: " << world_rank << std::endl;
 
     if (!Load(scene_data, sSceneFilename, ESfM_Data(VIEWS | INTRINSICS | EXTRINSICS | STRUCTURE))) {
         std::cerr << std::endl
                   << "The input sub SfM_Data file \"" << sSceneFilename << "\" cannot be read." << std::endl;
         return EXIT_FAILURE;
     }
+    std::cout << "Input scene " << world_rank << " loaded."<<  std::endl;
+
 
     if (sOutDir.empty()) {
         std::cerr << "\nIt is an invalid output directory" << std::endl;
@@ -176,11 +195,13 @@ int main(int argc, char **argv) {
         Save(scene_data,
              stlplus::create_filespec(sOutDir, "cam_" + std::to_string(world_rank), ".ply"),
              ESfM_Data(EXTRINSICS));
+        MPI_Finalize();
+        return EXIT_SUCCESS;
 
     } else {
         std::cerr << "distributed BA failed" << std::endl;
+        MPI_Finalize();
+        return EXIT_FAILURE;
     }
 
-
-    return EXIT_FAILURE;
 }
